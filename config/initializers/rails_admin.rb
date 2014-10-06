@@ -144,7 +144,7 @@ RailsAdmin.config do |config|
     view_in_app
   end
 
-  config.included_models = ['Playlist', 'Collage', 'Case', 'User', 'TextBlock', 'Media', 'Default', 'Institution', 'Page']
+  config.included_models = ['Playlist', 'Collage', 'Case', 'User', 'TextBlock', 'Media', 'Default', 'Institution', 'Page', 'CaseIngestionRequestion', 'CaseIngestionLog']
 
   config.model 'Page' do
     list do
@@ -256,5 +256,25 @@ RailsAdmin.config do |config|
       field :email_address
       field :created_at
     end
+  end
+
+  config.model 'CaseIngestionRequest' do
+    label "Case Ingestions"
+    edit do
+      field :url
+      field :user_id, :hidden do
+        default_value do
+          bindings[:view]._current_user.id
+        end
+      end
+    end
+    list do
+      field :url
+      field :case
+      field :case_ingestion_log
+    end
+  end
+  config.model 'CaseIngestionLog' do
+    visible false
   end
 end

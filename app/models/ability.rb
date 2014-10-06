@@ -78,8 +78,9 @@ class Ability
       can :aggregate_items, [Collage, Media, Playlist, TextBlock, Default, User]
       can [:show, :edit, :new], Institution
       cannot [:view_in_app, :edit_in_app], Institution
+      cannot [:view_in_app, :destroy], CaseIngestionRequest
       can [:import], [Default, Institution]
-
+      can [:show, :new], CaseIngestionRequest
       can [:new, :edit], Page
       cannot :edit_in_app, Page
 
