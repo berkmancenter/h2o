@@ -39,6 +39,19 @@ class Ability
 
       can [:embedded_pager, :access_level], :all
 
+      # User Collection related permissions
+      can :new, UserCollection
+      can [:edit, :destroy, :update, :manage_users, :manage_playlists, :manage_collages, :manage_permissions, :update_permissions], UserCollection, :user_id => user.id
+      can :create, :user_collections
+      all_permission_assignments = PermissionAssignment.where(user_id: user.id).includes(:permission, :user_collection => [:collages, :playlists])
+      permissions_by_id = all_permission_assignments.inject({}) { |h, pa| h[pa.permission.key.to_sym] = pa.user_collection.send("#{pa.permission.permission_type}s").collect { |i| i.id }; h }
+      can [:edit, :update, :delete_inherited_annotations, :save_readable_state], Collage, :id => permissions_by_id[:edit_collage] 
+      can [:edit, :update, :public_notes, :private_notes, :toggle_nested_private], Playlist, :id => permissions_by_id[:edit_playlist]
+      can [:update, :edit, :destroy], PlaylistItem, :playlist_id => permissions_by_id[:edit_playlist]
+      can [:show], Collage, :id => permissions_by_id[:view_private_collage]
+      can [:show], Playlist, :id => permissions_by_id[:view_private_playlist]
+      can [:position_update], Playlist, :id => permissions_by_id[:position_update]
+
       # Can do things on owned items
       can [:edit, :show, :update, :destroy], [Playlist, Collage, TextBlock, Media, Default], :user_id => user.id
       can [:position_update, :public_notes, :private_notes, :toggle_nested_private], Playlist, :user_id => user.id 
