@@ -154,7 +154,11 @@ class User < ActiveRecord::Base
   end
 
   def content_errors
-    self.has_role?(:superadmin) ? Defect.all : []
+    errors = []
+    (self.collages + self.text_blocks).each do |annotated_item|
+      errors << annotated_item.annotations.select { |a| a.error }
+    end
+    errors.flatten
   end
 
   def bookmarks

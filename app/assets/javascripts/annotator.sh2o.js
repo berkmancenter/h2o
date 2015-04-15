@@ -40,20 +40,22 @@ var $, Annotator, H2O,
 
 Annotator = _dereq_('annotator');
 
-Annotator.prototype.html.adder = '<div class="annotator-adder"><a href="#" id="adder_link" class="icon icon-adder-link" title="link">link</a><a href="#" id="adder_highlight" class="icon icon-adder-highlight" title="highlight">pencil</a><a id="adder_hide" class="icon icon-adder-hide" href="#" title="hide">eyeball</a><a id="adder_annotate" class="icon icon-adder-annotate" href="#" title="annotate">quote</a><button id="adder_button" type="button">Test Annotate</button></div>';
+//Annotator.prototype.html.adder = '<div class="annotator-adder"><a href="#" id="adder_link" class="icon icon-adder-link" title="link">link</a><a href="#" id="adder_highlight" class="icon icon-adder-highlight" title="highlight">pencil</a><a id="adder_hide" class="icon icon-adder-hide" href="#" title="hide">eyeball</a><a id="adder_annotate" class="icon icon-adder-annotate" href="#" title="annotate">quote</a><a id="adder_error" href="#" class="icon icon-error" title="Report Error">Error</a><a id="adder_feedback" href="#" class="icon icon-feedback" title="Feedback">Feedback</a><a id="adder_discuss" href="#" class="icon icon-discuss" title="Discuss">Discuss</a><button id="adder_button" type="button"></button></div>';
+Annotator.prototype.html.adder = '<div class="annotator-adder"><a href="#" id="adder_link" class="icon icon-adder-link" title="link">link</a><a href="#" id="adder_highlight" class="icon icon-adder-highlight" title="highlight">pencil</a><a id="adder_hide" class="icon icon-adder-hide" href="#" title="hide">eyeball</a><a id="adder_annotate" class="icon icon-adder-annotate" href="#" title="annotate">quote</a><a id="adder_error" href="#" class="icon icon-error" title="Report Error">Error</a><button id="adder_button" type="button"></button></div>';
 Annotator.Editor.prototype.html = '<div class="annotator-outer annotator-editor"><form class="annotator-widget"><ul class="annotator-listing"></ul><div class="annotator-controls"><a href="#cancel" class="annotator-cancel"></a><a href="#" id="h2o_delete">Delete</a><a href="#save" class="annotator-save annotator-focus">Save</a></div></form></div>';
 
 
 $ = Annotator.Util.$;
 
 H2O = (function() {
-  function H2O(categories, highlights_only) {
+  function H2O(categories, highlights_only, can_report, can_edit) {
     this.categories = categories;
     this.highlights_only = highlights_only;
     this.formatted_annotations = {};
     this.annotation_deleted_id = null;
     this.initialized = false;
-    this.collage_id = 0;
+    this.can_edit = can_edit;
+    this.annotated_item_id = 0;
     this.updateViewer = __bind(this.updateViewer, this);
     this.updateEditor = __bind(this.updateEditor, this);
     this.accessible_annotations = {};
@@ -65,23 +67,10 @@ H2O = (function() {
   H2O.prototype.input = null;
 
   H2O.prototype.pluginInit = function() {
-    if(!h2o_annotator.options.readOnly) {
+    if(h2o_annotator.plugins.H2O.can_edit) {
       $(document).delegate('#link', 'click', function(e) {
         if($(this).val() == '') {
           $(this).val('http://').select();
-        }
-      });
-
-      $(document).delegate('body', 'click', function(e) {
-        if($(e.target).hasClass('icon-edit') ||
-           $(e.target).parent().hasClass('annotator-adder') || 
-           $(e.target).hasClass('annotator-edit') || 
-           $(e.target).hasClass('annotation-indicator') || 
-           $(e.target).parent().hasClass('annotation-indicator')) {
-          return;
-        }
-        if($(e.target).parents('.annotator-editor').length == 0 && $('.annotator-editor .annotator-controls').is(':visible')) {
-          $('.annotator-cancel').trigger('click');
         }
       });
       $(document).delegate('.annotator-checkbox:not(.annotation_hidden_property) label, .annotator-checkbox2 label', 'click', function(e) {
@@ -94,16 +83,37 @@ H2O = (function() {
         h2o_annotator.editor.hide();
         $('.annotator-delete').trigger('click');
       });
-    } 
+    }
+
+    $(document).delegate('body', 'click', function(e) {
+      if($(e.target).hasClass('icon-edit') ||
+         $(e.target).hasClass('icon-delete') ||
+         $(e.target).parent().hasClass('annotator-adder') || 
+         $(e.target).hasClass('annotator-edit') || 
+         $(e.target).hasClass('annotation-indicator') || 
+         $(e.target).parent().hasClass('annotation-indicator')) {
+        return;
+      }
+      if($(e.target).parents('.annotator-editor').length == 0 && $('.annotator-editor .annotator-controls').is(':visible')) {
+        $('.annotator-cancel').trigger('click');
+      }
+    });
 
     $(document).delegate('.annotation-indicator-annotate,.annotation-indicator-link,.icon-adder-annotate,.icon-adder-link', 'mouseover', function(e) {
       $('.annotation-' + $(this).data('id')).addClass('with_comment');
       $('span.readonly-link,span.readonly-annotate').css('z-index', 99);
       $('#annotation-indicator-' + $(this).data('id')).find('span').css('z-index', 100);
-
+    });
+    $(document).delegate('.annotation-indicator-error', 'mouseover', function(e) {
+      $('.annotation-' + $(this).data('id')).addClass('with_error');
+      $('span.readonly-error').css('z-index', 99);
+      $('#annotation-indicator-' + $(this).data('id')).find('span').css('z-index', 100);
     });
     $(document).delegate('.annotation-indicator-annotate,.annotation-indicator-link,.icon-adder-annotate,.icon-adder-link', 'mouseout', function(e) {
       $('.annotation-' + $(this).data('id')).removeClass('with_comment');
+    });
+    $(document).delegate('.annotation-indicator-error', 'mouseout', function(e) {
+      $('.annotation-' + $(this).data('id')).removeClass('with_error');
     });
 
     $(document).delegate('#stats_expand', 'click', function(e) {
@@ -117,23 +127,9 @@ H2O = (function() {
         $('#stats_expand').hide();
       });
     });
-    if(h2o_annotator.options.readOnly) {
-      $(document).delegate('.annotation-indicator', 'click', function(e) {
-        if($(e.target).hasClass('link')) {
-          return;
-        }
-        if($(this).find('span.icon-adder-link').size() > 0) {
-          $('span.readonly-link,span.readonly-annotate').css('z-index', 99);
-          $(this).find('span.readonly-link').css('z-index', 100).toggle();
-        } 
-        if($(this).find('span.icon-adder-annotate').size() > 0) {
-          $('span.readonly-link,span.readonly-annotate').css('z-index', 99);
-          $(this).find('span.readonly-annotate').css('z-index', 100).toggle();
-        }
-        return;
-      });
-    } else {
-      $(document).delegate('.icon-adder-annotate,.icon-adder-link', 'click', function(e) {
+
+    if(h2o_annotator.plugins.H2O.can_edit) {
+      $(document).delegate('.icon-adder-annotate,.icon-adder-link,.icon-adder-error', 'click', function(e) {
         if($('div#stats').is(':visible')) {
           var height_offset = $('div#stats').offset().top + $('div#stats').height();
           if(height_offset > $(this).offset().top) {
@@ -144,9 +140,19 @@ H2O = (function() {
           }
         }
         e.preventDefault();
-        $(this).siblings('.edit-annotate,.edit-link').find('.icon-edit').show();
+        $(this).siblings('.edit-annotate,.edit-link,.delete-error').find('.icon-edit,.icon-trash').show();
         $(this).css({ 'opacity': 1.0 });
-        $(this).siblings('.edit-annotate,.edit-link').toggle();
+        $(this).siblings('.edit-annotate,.edit-link,.delete-error').toggle();
+      });
+      $(document).delegate('.delete-error .icon-delete', 'click', function(e) {
+        e.preventDefault();
+        var annotation = h2o_annotator.plugins.H2O.accessible_annotations[$(this).parent().parent().data('id')];
+        h2o_annotator.editor.annotation = annotation;
+        var position = $(this).parent().parent().position();
+        position.top += 4;
+        position.left += 9;
+        h2o_annotator.showViewer([annotation], position);
+        $('.annotator-delete').trigger('click');
       });
       $(document).delegate('.edit-annotate .icon-edit,.edit-link .icon-edit', 'click', function(e) {
         e.preventDefault();
@@ -179,7 +185,7 @@ H2O = (function() {
           $('.annotator-listing input#link').focus();
         }
       });
-      $(document).delegate('.annotation-indicator:not(.annotation-indicator-annotate,.annotation-indicator-link)', 'click', function(e) {
+      $(document).delegate('.annotation-indicator:not(.annotation-indicator-annotate,.annotation-indicator-link,.annotation-indicator-error)', 'click', function(e) {
         e.preventDefault();
         var annotation = h2o_annotator.plugins.H2O.accessible_annotations[$(this).data('id')];
 
@@ -203,6 +209,26 @@ H2O = (function() {
         $('.annotator-edit').trigger('click');
         h2o_annotator.editor.annotation = annotation;
       });
+    } else if(h2o_annotator.plugins.H2O.can_report) {
+      $(document).delegate('.annotation-indicator', 'click', function(e) {
+        if($(e.target).hasClass('link')) {
+          return;
+        }
+        if($(this).find('span.icon-adder-link').size() > 0) {
+          $('span.readonly-link,span.readonly-annotate').css('z-index', 99);
+          $(this).find('span.readonly-link').css('z-index', 100).toggle();
+        } 
+        if($(this).find('span.icon-adder-annotate').size() > 0) {
+          $('span.readonly-link,span.readonly-annotate').css('z-index', 99);
+          $(this).find('span.readonly-annotate').css('z-index', 100).toggle();
+        }
+        if($(this).find('span.icon-adder-error').size() > 0) {
+          $('span.readonly-link,span.readonly-annotate,span.delete-error').css('z-index', 99);
+          $(this).find('span.delete-error').css('z-index', 100).toggle();
+        }
+        return;
+      });
+    } else {
     }
 
     $(document).delegate('.annotator-adder > a:not(.hexes a)', 'click', function(e) {
@@ -215,11 +241,19 @@ H2O = (function() {
       $('.annotator-editor').addClass('new_item');
       $('#link').val('');
 
-      if($(this).attr('id') == 'adder_annotate') {
-        $('.annotator-editor').addClass('annotate');
+      //TODO: Change this to test
+      if($(this).attr('id') == 'adder_annotate' || $(this).attr('id') == 'adder_error' || $(this).attr('id') == 'adder_feedback' || $(this).attr('id') == 'adder_discuss') {
+        $('.annotator-editor').addClass($(this).attr('id').replace(/^adder_/, ''));
         $('.annotator-listing textarea').parent().show();
         $('.annotator-adder button').trigger('click');
         $('.annotator-listing textarea').focus();
+        if($(this).attr('id') == 'adder_annotate') {
+          $('#annotator-field-0').attr('placeholder', 'Comments...');
+        } else if($(this).attr('id') == 'adder_error') {
+          $('#annotator-field-0').attr('placeholder', 'Report Error...');
+        } else if($(this).attr('id') == 'adder_feedback') {
+          $('#annotator-field-0').attr('placeholder', 'Report Feedback...');
+        }
       } else if ($(this).attr('id') == 'adder_highlight') {
         $('.annotator-editor').addClass('highlight');
         $('.annotator-listing .annotator-checkbox:not(.annotation_hidden_property), .annotator-listing .annotator-checkbox2').show();
@@ -276,21 +310,12 @@ H2O = (function() {
 
       collages.rehighlight();
 
-      if(h2o_annotator.options.readOnly) {
-        access_results = { 'can_edit' : false };
-      }
-
       if($('#collage_print').size() > 0) {
         collages.loadState($('.singleitem').data('itemid'), original_data);
       }
 
       if($('#print-options').size() > 0) {
-        collages.loadState(this.plugins.H2O.collage_id, all_collage_data["collage" + this.plugins.H2O.collage_id].data);
-      }
-
-      //loadState has to be before listenTo
-      if(!h2o_annotator.options.readOnly) {
-        collages.listenToRecordAnnotatedItemState();
+        collages.loadState(this.plugins.H2O.annotated_item_id, all_collage_data["collage" + this.plugins.H2O.annotated_item_id].data);
       }
 
       $('.annotator-edit,.annotator-delete').css('opacity', 0.0);
@@ -343,6 +368,9 @@ H2O = (function() {
         }
       });
 
+      editor.annotation.error = $('.annotator-editor').hasClass('error');
+      editor.annotation.discuss = $('.annotator-editor').hasClass('discuss');
+      editor.annotation.feedback = $('.annotator-editor').hasClass('feedback');
       editor.annotation.hidden = $('#adder_hide').hasClass('active');
     });
 
@@ -539,14 +567,14 @@ H2O = (function() {
           h2o_annotator.plugins.H2O.updateAllAnnotationIndicators();
         }
       } else if(annotation.highlight_only !== null) {
-        if(!h2o_annotator.options.readOnly) {
+        if(h2o_annotator.plugins.H2O.can_edit) {
           $('.annotator-wrapper').append($('<a>').attr('data-id', annotation.id).addClass('annotation-indicator icon icon-adder-highlight-only indicator-highlight-hex-' + annotation.highlight_only).attr('id', 'annotation-indicator-' + annotation.id).css({ 'top' : start_position, 'right' : -31 }));
         }
       } else if(annotation.link !== null) {
         var div = $('<div>').attr('data-id', annotation.id).addClass('annotation-indicator annotation-indicator-link').attr('id', 'annotation-indicator-' + annotation.id).css({ 'top': start_position });
         div.append($('<span>').addClass('icon icon-adder-link'));
         var html = '<a class="link" target="_blank" href="' + annotation.link + '">' + annotation.link + '</a>';
-        if(h2o_annotator.options.readOnly) {
+        if(h2o_annotator.plugins.H2O.can_edit) {
           div.append($('<span>').addClass('readonly-link').html(html));
         } else {
           var text_node = $('<span>').addClass('edit-link').html(html);
@@ -559,7 +587,7 @@ H2O = (function() {
         $('.annotator-wrapper').append(div);
       } else if(annotation.layers.length > 0) {
         var div_type = '<a>';
-        if(h2o_annotator.options.readOnly) {
+        if(h2o_annotator.plugins.H2O.can_edit) {
           div_type = '<span>';
         }
         var div = $(div_type).addClass('annotation-indicator annotation-indicator-highlights').attr('id', 'annotation-indicator-' + annotation.id).attr('data-id', annotation.id).css({ 'top': start_position, 'opacity': 0.0 });
@@ -570,18 +598,33 @@ H2O = (function() {
         }
         $('.annotator-wrapper').append(div);
         div.css({ 'right': (div.width() + 17)*-1, 'opacity': 1.0 });
+      } else if(annotation.error) {
+        var div = $('<div>').attr('data-id', annotation.id).addClass('annotation-indicator annotation-indicator-error').attr('id', 'annotation-indicator-' + annotation.id).css({ 'top': start_position });
+        div.append($('<span>').addClass('icon icon-adder-error'));
+        if(h2o_annotator.plugins.H2O.can_edit) {
+          var text_node = $('<span>').addClass('delete-error').html(annotation.text);
+          text_node.append($('<span>').html(' (Reported by: <a href="/users/' + annotation.user_id + '">' + annotation.user_email + '</a>)'));
+          text_node.append($('<a>').attr('href', '#').addClass('icon icon-delete'));
+          div.append(text_node);
+          if($('#show_comments .toggle-inner .toggle-on').hasClass('active')) {
+            text_node.show();
+          }
+        } else {
+          div.append($('<span>').addClass('readonly-error').html(annotation.text).show());
+        }
+        $('.annotator-wrapper').append(div);
       } else {
         var div = $('<div>').attr('data-id', annotation.id).addClass('annotation-indicator annotation-indicator-annotate').attr('id', 'annotation-indicator-' + annotation.id).css({ 'top': start_position });
         div.append($('<span>').addClass('icon icon-adder-annotate'));
-        if(h2o_annotator.options.readOnly) {
-          div.append($('<span>').addClass('readonly-annotate').html(annotation.text));
-        } else {
+        if(h2o_annotator.plugins.H2O.can_edit) {
           var text_node = $('<span>').addClass('edit-annotate').html(annotation.text);
           text_node.append($('<a>').attr('href', '#').addClass('icon icon-edit'));
           div.append(text_node);
           if($('#show_comments .toggle-inner .toggle-on').hasClass('active')) {
             text_node.show();
           }
+        } else {
+          div.append($('<span>').addClass('readonly-annotate').html(annotation.text));
         }
         $('.annotator-wrapper').append(div);
       }
@@ -911,19 +954,27 @@ H2O = (function() {
             "endOffset": annotation.end_offset
       }];
       var layers = new Array();
-      for(var _j = 0; _j < annotation.layers.length; _j++) {
-        layers.push(annotation.layers[_j].name);
+      if(annotation.layers !== undefined) {
+        for(var _j = 0; _j < annotation.layers.length; _j++) {
+          layers.push(annotation.layers[_j].name);
+        }
       }
       var formatted_annotation = { "id" : annotation.id,
         "text" : annotation.annotation,
         "ranges": ranges,
         "layers": layers,
         "cloned": annotation.cloned,
-        "collage_id" : annotation.collage_id,
         "link" : annotation.link,
         "hidden" : annotation.hidden,
-        "highlight_only": annotation.highlight_only
+        "error" : annotation.error,
+        "discuss" : annotation.discuss,
+        "feedback" : annotation.feedback,
+        "highlight_only": annotation.highlight_only,
+        "user_id" : annotation.user_id
       };
+      if(annotation.user !== undefined) {
+        formatted_annotation.user_email = annotation.user.email_address;
+      }
       formatted_annotation.ranges = ranges;
       formatted_annotations.push(formatted_annotation);
     });
@@ -933,7 +984,7 @@ H2O = (function() {
 
   H2O.prototype.loadAnnotations = function(c_id, current_annotations, page_load) {
     if(page_load) {
-      this.collage_id = c_id;
+      this.annotated_item_id = c_id;
     }
 
     var data = this.format_annotations(current_annotations);

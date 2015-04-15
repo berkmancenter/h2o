@@ -15,7 +15,7 @@
   <%= link_to raw('<span class="icon icon-favorite-large"><span>Bookmark ' + @collage.annotated_label + '</span></span>'), '#', :class => "bookmark-action tooltip requires_logged_in", :title => "Bookmark #{@collage.name}", "data-type" => "collage", "data-itemid" => @collage.id %>
 </aside>
 
-<div id="collage<%= @collage.id %>" class="singleitem leftcol" data-itemid="<%= @collage.id %>" data-public="<%= @collage.public %>">
+<div id="collage<%= @collage.id %>" class="singleitem leftcol" data-itemid="<%= @collage.id %>" data-public="<%= @collage.public %>" data-user_id="<%= @collage.user_id %>">
   <div id="main_details">
     <h1 class="scale1-5"><%= @collage.name %></h1>
     <h6 class="scale0-9 <%= @collage.root != @collage ? 'with_creators' : '' %>">

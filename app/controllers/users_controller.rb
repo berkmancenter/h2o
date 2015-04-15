@@ -183,6 +183,11 @@ class UsersController < ApplicationController
           :display => false,
           :header => "Content Errors",
           :partial => "content_error"
+        },
+        :comments => {
+          :display => false,
+          :header => "User Responses",
+          :partial => "comment"
         }
       }
       if current_user && @user == current_user
@@ -198,9 +203,8 @@ class UsersController < ApplicationController
           @types[:case_requests][:display] = true
         end
 
-        if @user.has_role?(:superadmin)
-          @types[:content_errors][:display] = true
-        end
+        @types[:content_errors][:display] = true
+        @types[:comments][:display] = true
       else
         @page_title = "User #{@user.simple_display} | H2O Classroom Tools"
       end

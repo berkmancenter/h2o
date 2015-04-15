@@ -11740,6 +11740,7 @@ Editor = (function(_super) {
     controls = editor.find('.annotator-controls');
     throttle = false;
     onMousedown = function(event) {
+    console.log(event.pageY);
       if (event.target === this) {
         mousedown = {
           element: this,
@@ -12654,9 +12655,11 @@ Util.mousePosition = function(e, offsetEl) {
     offsetEl = $(offsetEl).offsetParent()[0];
   }
   offset = $(offsetEl).offset();
+ 
+  //H2O Customization for adjustment
   return {
-    top: e.pageY - offset.top,
-    left: e.pageX - offset.left
+    top: e.pageY - offset.top - 25,
+    left: e.pageX - offset.left - 130
   };
 };
 

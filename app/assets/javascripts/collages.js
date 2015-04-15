@@ -6,7 +6,6 @@ var last_annotation = 0;
 var annotation_position = 0;
 var head_offset;
 var update_unlayered_end = 0;
-var collage_id;
 var original_annotations;
 
 h2o_global.collage_afterload = function(results) {
@@ -17,11 +16,12 @@ h2o_global.collage_afterload = function(results) {
     $('#description .delete-action').remove();
   }
   if(results.can_edit) {
-    collages.initiate_annotator(true);  
+    h2o_global.initiate_annotator('collages', false, true);  
     $('.requires_edit').animate({ opacity: 1.0 });
     $('.edit-action').animate({ opacity: 1.0 });
+    collages.listenToRecordAnnotatedItemState();
   } else {
-    collages.initiate_annotator(false);  
+    h2o_global.initiate_annotator('collages', true, false);  
     $('.requires_edit').remove();
     $('.edit-action').remove();
   }
@@ -134,33 +134,6 @@ var collages = {
 	  $.each(updated, function(key, value) {
 	    keys_arr.push(key);
 	  });
-  },
-  initiate_annotator: function(can_edit) {
-    $('div.article *:not(.paragraph-numbering)').addClass('original_content');
-
-    collage_id = h2o_global.getItemId();
-    var elem = $('div.article');
-
-    var factory = new Annotator.Factory();
-    var Store = Annotator.Plugin.fetch('Store');
-    var h2o = Annotator.Plugin.fetch('H2O');
-
-    h2o_annotator = factory.setStore(Store, { 
-      prefix: '/collages/' + h2o_global.getItemId() + '/annotations',
-      urls: {
-        create: '',
-        read: '/annotations/:id',
-        update: '/:id',
-        destroy: '/:id',
-        search: '/search'
-      }
-    }).addPlugin(h2o, layer_data, highlights_only).getInstance();
-    if(!can_edit) {
-      $('.article').addClass('read_only');
-      h2o_annotator.options.readOnly = true;
-    }
-    h2o_annotator.attach(elem);
-    h2o_annotator.plugins.H2O.loadAnnotations(h2o_global.getItemId(), raw_annotations.single, true);
   },
   slideToParagraph: function() {
     if(document.location.hash.match(/^#p[0-9]+/)) {

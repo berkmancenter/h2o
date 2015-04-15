@@ -5,7 +5,9 @@ class AnnotationSweeper < ActionController::Caching::Sweeper
   observe Annotation
 
   def collage_clear(record)
-    ActionController::Base.expire_page "/collages/#{record.collage.id}.html"
+    if record.annotated_item_type == 'Collage'
+      ActionController::Base.expire_page "/collages/#{record.annotated_item_id}.html"
+    end
   end
 
   def after_save(record)

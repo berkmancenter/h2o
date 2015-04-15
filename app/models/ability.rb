@@ -47,7 +47,7 @@ class Ability
         playlist_item.playlist.user == user
       end
       can [:update, :destroy], Annotation do |annotation|
-        annotation.collage.user == user
+        annotation.annotated_item.user == user
       end
 
       # Dropbox related permissions

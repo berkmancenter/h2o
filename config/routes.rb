@@ -43,6 +43,7 @@ H2o::Application.routes.draw do
     end
   end
   resources :text_blocks do
+    resources :annotations
     member do
       get 'export'
     end

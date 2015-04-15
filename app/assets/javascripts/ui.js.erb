@@ -14,6 +14,7 @@ var list_results_url = '';
 var playlists_initialized = false;
 var user_drilldown = [];
 var scrollpane_api;
+var annotated_item_id;
 
 $.extend({
   mustache: function(template, data, partial, stream) {
@@ -218,7 +219,6 @@ var h2o_global = {
       });
       $('#fixed_links').fadeIn();
       if($('.slide-out-div').size() && page_load) {
-        h2o_global.loadSlideOutTabBehavior(top_offset + 30);
         page_load = false;
       }
     }
@@ -653,53 +653,6 @@ var h2o_global = {
       $('.right_panel').css('opacity', 1.0);
     });
   },
-  loadSlideOutTabBehavior: function(top_offset) {
-    $('.slide-out-div').tabSlideOut({
-      tabHandle: '.handle',                     //class of the element that will become your tab
-      pathToTabImage: '<%= asset_path 'report_error.png' %>', //path to the image for the tab //Optionally can be set using css
-      imageHeight: '135px',                     //height of tab image           //Optionally can be set using css
-      imageWidth: '28px',                       //width of tab image            //Optionally can be set using css
-      tabLocation: 'right',                      //side of screen where tab lives, top, right, bottom, or left
-      speed: 500,                               //speed of animation
-      action: 'click',                          //options: 'click' or 'hover', action to trigger animation
-      topPos: top_offset + 'px',                          //position from the top/ use if tabLocation is left or right
-      leftPos: '20px',                          //position from left/ use if tabLocation is bottom or top
-      fixedPosition: true                      //options: true makes it stick(fixed position) on scroll
-      //FIXME: on open hide errors
-    });
-    $('#defect_submit').click(function(e) {
-      e.preventDefault();
-      $('#defect-form').ajaxSubmit({
-        dataType: "JSON",
-        beforeSend: function(){
-          h2o_global.showGlobalSpinnerNode();
-          $('#user-feedback-success, #user-feedback-error').hide().html('');
-        },
-        success: function(response){
-          h2o_global.hideGlobalSpinnerNode();
-          $('.slide-out-div').css('height', $('.slide-out-div').height() + 30);
-          if(response.error) {
-            $('#user-feedback-error').show().html(response.message);
-          } else {
-            h2o_global.hideGlobalSpinnerNode();
-            $('#user-feedback-success').show().html('Thanks for your feedback. Panel will close shortly.');
-            $('#defect_description').val(' ');
-            setTimeout(function() {
-              $('.handle').click();
-              setTimeout(function() {
-                $('#user-feedback-success, #user-feedback-error').hide().html('');
-              }, 500);
-            }, 2000);
-          }
-        },
-        error: function(data){
-          h2o_global.hideGlobalSpinnerNode();
-          $('.slide-out-div').css('height', $('.slide-out-div').height() + 30);
-          $('#user-feedback-error').show().html('Sorry. We could not process your error. Please try again.');
-        }
-      });
-    });
-  },
   hideVisiblePopups: function() {
     if($('.btn-a-active').length) {
       $('.btn-a-active').click();
@@ -768,7 +721,7 @@ var h2o_global = {
       }
       if($('body').attr('id') == 'collages_show') {
         access_results = { "can_edit" : false };
-        collages.initiate_annotator(false);
+        h2o_global.initiate_annotator('collages', false, false);
       }
       h2o_global.setFontClasses();
       return;
@@ -1442,6 +1395,52 @@ var h2o_global = {
       h2o_global.toggle_terms();
     });  
     h2o_global.toggle_terms();
+  },
+  initiate_annotator: function(annotated_type, can_report, can_edit) {
+  console.log(can_report + ' ' + can_edit);
+    if(annotated_type == 'text_blocks' && !can_report && !can_edit) {
+      return;
+    }
+
+    $('div.article *:not(.paragraph-numbering)').addClass('original_content');
+
+    annotated_item_id = h2o_global.getItemId();
+    var elem = $('div.article');
+
+    var factory = new Annotator.Factory();
+    var Store = Annotator.Plugin.fetch('Store');
+    var h2o = Annotator.Plugin.fetch('H2O');
+
+    h2o_annotator = factory.setStore(Store, { 
+      prefix: '/' + annotated_type + '/' + h2o_global.getItemId() + '/annotations',
+      urls: {
+        create: '',
+        read: '/annotations/:id',
+        update: '/:id',
+        destroy: '/:id',
+        search: '/search'
+      }
+    }).addPlugin(h2o, layer_data, highlights_only, can_report, can_edit).getInstance();
+
+    h2o_annotator.options.readOnly = !(can_edit || can_report);
+    h2o_annotator.attach(elem);
+    h2o_annotator.plugins.H2O.loadAnnotations(h2o_global.getItemId(), raw_annotations.single, true);
+   
+    if(!can_report && !can_edit) {
+      h2o_annotator.options.readOnly = true;
+    } else if(can_report) {
+      $('#adder_link,#adder_highlight,#adder_hide,#adder_annotate').remove();
+      $('.annotator-adder').css('width', '102px');
+    } else if(can_edit) {
+      if(h2o_global.class_type() == 'collages') {
+        $('#adder_error,#adder_feedback,#adder_discuss').remove();
+      } else {
+        //make it so text highlighting won't trigger anything?
+        $('#adder_link,#adder_highlight,#adder_hide,#adder_annotate').remove();
+        $('#adder_error,#adder_feedback,#adder_discuss').remove();
+      }
+    }
+
   }
 };
 

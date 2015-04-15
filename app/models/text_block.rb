@@ -15,10 +15,11 @@ class TextBlock < ActiveRecord::Base
 
   acts_as_taggable_on :tags
 
-  has_many :annotations, :through => :collages
   has_many :collages, :as => :annotatable
   has_many :defects, :as => :reportable
   has_many :playlist_items, :as => :actual_object
+  has_many :frozen_items, :as => :item
+  has_many :annotations, -> { order(:created_at) }, :dependent => :destroy, :as => :annotated_item
   belongs_to :user
 
   validates_presence_of :name
@@ -30,6 +31,10 @@ class TextBlock < ActiveRecord::Base
       WHERE taggable_type = 'TextBlock'
       GROUP BY ts.tag_id, t.name
       ORDER BY COUNT(*) DESC LIMIT 25")
+  end
+
+  def deleteable_tags
+    []
   end
 
   def display_name

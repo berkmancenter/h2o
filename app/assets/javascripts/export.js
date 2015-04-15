@@ -2,7 +2,6 @@ var all_tts;
 var annotations;
 var original_data = {};
 var layer_data;
-var collage_id;
 var h2o_annotator;
 var all_collage_data = {};
 

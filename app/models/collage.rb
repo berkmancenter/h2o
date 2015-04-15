@@ -22,7 +22,7 @@ class Collage < ActiveRecord::Base
 
   belongs_to :annotatable, :polymorphic => true
   belongs_to :user
-  has_many :annotations, -> { order(:created_at) }, :dependent => :destroy
+  has_many :annotations, -> { order(:created_at) }, :dependent => :destroy, :as => :annotated_item
   has_and_belongs_to_many :user_collections,  :dependent => :destroy
   has_many :defects, :as => :reportable
   has_many :color_mappings
@@ -82,7 +82,7 @@ class Collage < ActiveRecord::Base
     collage_copy.color_mappings = []
     collage_copy.tag_list = self.tag_list.join(', ')
 
-    self.annotations.each do |annotation|
+    self.annotations.select { |b| !b.error }.each do |annotation|
       new_annotation = annotation.dup
       new_annotation.cloned = true
       new_annotation.layer_list = annotation.layer_list
@@ -146,24 +146,17 @@ class Collage < ActiveRecord::Base
     self.layers.map(&:name)
   end
 
-  def layer_report
-    layers = {}
-    self.annotations.each do |ann|
-      ann.layers.each do |l|
-        if layers[l.id].blank?
-          layers[l.id] = {:count => 0, :name => l.name, :annotation_count => 0}
-        end
-        layers[l.id][:count] = layers[l.id][:count].to_i + ann.word_count
-        layers[l.id][:annotation_count] = layers[l.id][:annotation_count].to_i + 1
-      end
-    end
-    return layers
-  end
-
   def editable_content
     return '' if self.annotatable.nil?
 
-    doc = Nokogiri::HTML.parse(self.annotatable.content.gsub(/\r\n/, ''))
+    original_content = ''
+    if self.version == self.annotatable.version
+      original_content = self.annotatable.content
+    else
+      original_content = self.annotatable.frozen_items.detect { |f| f.version = self.version }.content 
+    end
+
+    doc = Nokogiri::HTML.parse(original_content.gsub(/\r\n/, ''))
 
     # Footnote markup
     doc.css("a").each do |li|
@@ -201,7 +194,8 @@ class Collage < ActiveRecord::Base
         FROM annotations a
         JOIN taggings t ON a.id = t.taggable_id
         WHERE t.taggable_type = 'Annotation'
-        AND a.collage_id = '#{self.id}'
+        AND a.annotated_item_id = '#{self.id}'
+        AND a.annotated_item_type = 'Collage'
         GROUP BY tag_id) b
       WHERE b.count = 1").collect { |t| t.id }
   end
