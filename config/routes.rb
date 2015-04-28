@@ -43,6 +43,7 @@ H2o::Application.routes.draw do
     end
   end
   resources :text_blocks do
+    resources :responses, :only => [:create, :destroy]
     resources :annotations
     member do
       get 'export'
@@ -64,6 +65,8 @@ H2o::Application.routes.draw do
       get 'embedded_pager'
     end
   end
+  
+
   resources :playlists do
     member do
       post 'copy'
@@ -90,6 +93,7 @@ H2o::Application.routes.draw do
     end
   end
   resources :collages do
+    resources :responses, :only => [:create, :destroy]
     resources :annotations
     member do
       get 'access_level'

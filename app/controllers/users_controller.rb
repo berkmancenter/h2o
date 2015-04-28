@@ -184,10 +184,10 @@ class UsersController < ApplicationController
           :header => "Content Errors",
           :partial => "content_error"
         },
-        :comments => {
+        :user_responses => {
           :display => false,
           :header => "User Responses",
-          :partial => "comment"
+          :partial => "response"
         }
       }
       if current_user && @user == current_user
@@ -204,7 +204,7 @@ class UsersController < ApplicationController
         end
 
         @types[:content_errors][:display] = true
-        @types[:comments][:display] = true
+        @types[:user_responses][:display] = true
       else
         @page_title = "User #{@user.simple_display} | H2O Classroom Tools"
       end
@@ -216,6 +216,7 @@ class UsersController < ApplicationController
         if type == :case_requests
           p = CaseRequest.all.sort_by { |p| (p.respond_to?(params[:sort]) ? p.send(params[:sort]) : p.send(:display_name)).to_s.downcase }
         else
+        Rails.logger.warn "stephie: #{type}"
           p = @user.send(type).sort_by { |j| (j.respond_to?(params[:sort]) ? j.send(params[:sort]) : j.send(:display_name)).to_s.downcase }
         end
 

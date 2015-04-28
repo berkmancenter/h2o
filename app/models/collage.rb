@@ -27,6 +27,7 @@ class Collage < ActiveRecord::Base
   has_many :defects, :as => :reportable
   has_many :color_mappings
   has_many :playlist_items, :as => :actual_object
+  has_many :responses, -> { order(:created_at) }, :dependent => :destroy, :as => :resource
 
   validates_presence_of :annotatable_type, :annotatable_id
   validates_length_of :description, :in => 1..(5.kilobytes), :allow_blank => true
@@ -130,6 +131,8 @@ class Collage < ActiveRecord::Base
   end
 
   def display_name
+
+Rails.logger.warn "stephie: #{self.inspect}"
     "#{self.name}, #{self.created_at.to_s(:simpledatetime)}#{(self.user.nil?) ? '' : ' by ' + self.user.login}"
   end
   alias :to_s :display_name

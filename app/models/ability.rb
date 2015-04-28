@@ -25,6 +25,7 @@ class Ability
       can [:user_lookup, :playlists, :disconnect_canvas, :disconnect_dropbox], :users
       can :create, :defects
       can :quick_collage, :base
+      can :create, :responses
 
       can :destroy, :user_sessions
       can [:bookmark_item, :delete_bookmark_item, :verification_request, :verify], :users
@@ -48,6 +49,9 @@ class Ability
       end
       can [:update, :destroy], Annotation do |annotation|
         annotation.annotated_item.user == user
+      end
+      can :destroy, Response do |response|
+        response.resource.user == user
       end
 
       # Dropbox related permissions

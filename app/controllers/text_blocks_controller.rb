@@ -66,7 +66,8 @@ class TextBlocksController < BaseController
 
   private
   def text_blocks_params
-    params.require(:text_block).permit(:id, :name, :public, :description, :tag_list, :content, :version, 
+    params.require(:text_block).permit(:id, :name, :public, :description, :tag_list, :content, :version,
+                                       :enable_feedback, :enable_discussions, :enable_responses,
                                        metadatum_attributes: [:contributor, :coverage, :creator, :date,
                                                               :description, :format, :identifier, :language,
                                                               :publisher, :relation, :rights, :source,

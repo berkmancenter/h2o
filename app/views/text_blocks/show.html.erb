@@ -26,11 +26,10 @@
   <div class="article">
     <%= raw @text_block.sanitized_content %>
   </div>
+  <% if current_user && @text_block.enable_responses -%>
+  <%= render "shared/item_response" %>
+  <% end -%>
 </div>
-<% if @text_block.enable_responses -%>
-<textarea></textarea>
-<a href="#" id="submit_response">
-<% end -%>
 
 <div id="stats" class="right_panel">
   <a href="#" class="right_panel_close">Close</a>

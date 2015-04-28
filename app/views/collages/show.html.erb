@@ -89,6 +89,10 @@
 	  <% cache(["editable-content", @collage.annotatable], :expires_in => 2.weeks, :compress => H2O_CACHE_COMPRESSION) do %>
     <% end -%>
   </div>
+  
+  <% if @collage.enable_responses -%>
+  <%= render "shared/item_response" %>
+  <% end -%>
 </div>
 
 <div id="stats" class="right_panel">

@@ -1,0 +1,17 @@
+<li class="listitem listitem<%= response.id %>" data-itemid="<%= response.id %>">
+	<div class="details">
+    <h3>
+      <% if response.resource_type == 'TextBlock' -%>
+      <%= link_to "Text Block: #{response.resource.name}", text_block_path(response.resource_id) %>
+      <%= link_to 'DELETE', text_block_response_path(response.resource_id, response.id), :class => "icon icon-delete tooltip", "data-type" => "response", "data-id" => response.id %>
+      <% else -%>
+      <%= link_to "Annotated Item: #{response.resource.name}", collage_path(response.resource_id) %>
+      <%= link_to 'DELETE', collage_response_path(response.resource_id, response.id), :class => "icon icon-delete tooltip", "data-type" => "response", "data-id" => response.id %>
+      <% end -%>
+    </h3>
+    <p>Created by <%= link_to(response.user.display, user_path(response.user)) %> on <%= response.created_at.strftime("%B %d, %Y") %></p>
+    <p class="error"><b>Content:</b> <%= response.content %></p>
+    <a href="mailto:<%= response.user.email_address -%>" class="button">Respond</a>
+  </div>
+	<div class="clear"></div>
+</li>

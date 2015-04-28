@@ -28,12 +28,14 @@ class CollagesController < BaseController
       render :json => {
         :can_edit             => can?(:edit, @collage),
         :can_destroy          => can?(:destroy, @collage),
+        #:responses            => can?(:edit) ? #all : only current user 
         :custom_block         => "collage_afterload"
       }
     else
       render :json => {
         :can_edit             => false,
         :readable_state       => @collage.readable_state || { :edit_mode => false }.to_json,
+        :responses            => [].to_json,
         :custom_block         => "collage_v2_afterload"
       }
     end
@@ -136,6 +138,7 @@ class CollagesController < BaseController
 
   private
   def collages_params
-    params.require(:collage).permit(:name, :public, :tag_list, :description, :annotatable_type, :annotatable_id, :featured)
+    params.require(:collage).permit(:name, :public, :tag_list, :description, :annotatable_type, :annotatable_id, :featured,
+                                    :enable_feedback, :enable_discussions, :enable_responses)
   end
 end

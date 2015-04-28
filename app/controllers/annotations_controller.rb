@@ -82,7 +82,6 @@ class AnnotationsController < BaseController
     elsif params.has_key?(:collage_id)
       params[:annotation].merge!({ :annotated_item_id => params[:collage_id], :annotated_item_type => "Collage" })
     end
-Rails.logger.warn "stephie: #{params.inspect}"
 
     @annotation = Annotation.new(annotations_params)
  

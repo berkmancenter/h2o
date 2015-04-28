@@ -75,7 +75,6 @@ class ApplicationController < ActionController::Base
   def check_authorization_h2o
     return true if params[:controller] == "rails_admin/main"
 
-Rails.logger.warn "stephie: #{params.inspect}"
     if @single_resource.present?
       authorize! params[:action].to_sym, @single_resource
     else

@@ -20,6 +20,7 @@ class TextBlock < ActiveRecord::Base
   has_many :playlist_items, :as => :actual_object
   has_many :frozen_items, :as => :item
   has_many :annotations, -> { order(:created_at) }, :dependent => :destroy, :as => :annotated_item
+  has_many :responses, -> { order(:created_at) }, :dependent => :destroy, :as => :resource
   belongs_to :user
 
   validates_presence_of :name
