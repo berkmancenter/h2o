@@ -28,7 +28,8 @@ class CollagesController < BaseController
       render :json => {
         :can_edit             => can?(:edit, @collage),
         :can_destroy          => can?(:destroy, @collage),
-        #:responses            => can?(:edit) ? #all : only current user 
+        :responses            => can?(:edit, @collage) ? @collage.responses.to_json(:only => [:created_at, :content, :user_id]) :
+                                   current_user.responses.select { |r| r.resource == @collage }.to_json(:only => [:created_at, :content]),
         :custom_block         => "collage_afterload"
       }
     else
