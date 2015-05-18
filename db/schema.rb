@@ -184,10 +184,10 @@ ActiveRecord::Schema.define(version: 20150415162129) do
     t.integer  "annotator_version",                  default: 2,     null: false
     t.boolean  "featured",                           default: false, null: false
     t.boolean  "created_via_import",                 default: false, null: false
-    t.integer  "version",                            default: 1,     null: false
     t.boolean  "enable_feedback",                    default: false, null: false
     t.boolean  "enable_discussions",                 default: false, null: false
     t.boolean  "enable_responses",                   default: false, null: false
+    t.integer  "version",                            default: 1,     null: false
   end
 
   add_index "collages", ["ancestry"], name: "index_collages_on_ancestry", using: :btree
@@ -210,14 +210,6 @@ ActiveRecord::Schema.define(version: 20150415162129) do
     t.string   "hex"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "comments", force: true do |t|
-    t.text     "content"
-    t.integer  "user_id",       null: false
-    t.string   "resource_type", null: false
-    t.integer  "resource_id",   null: false
-    t.datetime "created_at"
   end
 
   create_table "content_images", force: true do |t|
@@ -527,6 +519,14 @@ ActiveRecord::Schema.define(version: 20150415162129) do
   add_index "questions", ["updated_at"], name: "index_questions_on_updated_at", using: :btree
   add_index "questions", ["user_id"], name: "index_questions_on_user_id", using: :btree
 
+  create_table "responses", force: true do |t|
+    t.text     "content"
+    t.integer  "user_id",       null: false
+    t.string   "resource_type", null: false
+    t.integer  "resource_id",   null: false
+    t.datetime "created_at"
+  end
+
   create_table "roles", force: true do |t|
     t.string   "name",              limit: 40
     t.string   "authorizable_type", limit: 40
@@ -683,10 +683,10 @@ ActiveRecord::Schema.define(version: 20150415162129) do
     t.integer  "user_id",                            default: 0,     null: false
     t.boolean  "created_via_import",                 default: false, null: false
     t.string   "description",        limit: 5242880
-    t.integer  "version",                            default: 1,     null: false
     t.boolean  "enable_feedback",                    default: false, null: false
     t.boolean  "enable_discussions",                 default: false, null: false
     t.boolean  "enable_responses",                   default: false, null: false
+    t.integer  "version",                            default: 1,     null: false
   end
 
   add_index "text_blocks", ["created_at"], name: "index_text_blocks_on_created_at", using: :btree
