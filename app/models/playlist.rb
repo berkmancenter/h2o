@@ -271,19 +271,6 @@ class Playlist < ActiveRecord::Base
     ( pas.collect { |pr| pr.user }.flatten.collect { |u| u.login } + [self.user.login] ).flatten.uniq
   end
 
-  def self.clear_nonsiblings(id) 
-    record = PlaylistItem.unscoped { Playlist.where(id: id) }.first
-
-    ActionController::Base.expire_page "/playlists/#{record.id}.html"
-    ActionController::Base.expire_page "/playlists/#{record.id}/export.html"
-    ActionController::Base.expire_page "/playlists/#{record.id}/export_all.html"
-    record.relation_ids.each do |p|
-      ActionController::Base.expire_page "/playlists/#{p}.html"
-      ActionController::Base.expire_page "/playlists/#{p}/export.html"
-      ActionController::Base.expire_page "/playlists/#{p}/export_all.html"
-    end
-  end
-
   def h2o_clone(new_user, params)
     playlist_copy = self.dup
     playlist_copy.parent = self
@@ -303,31 +290,53 @@ class Playlist < ActiveRecord::Base
     playlist_copy
   end
 
+  def self.clear_nonsiblings(id)
+    record = PlaylistItem.unscoped { Playlist.where(id: id) }.first
+
+    playlist_ids = [record.id, record.relation_ids].flatten
+    playlist_ids.each do |rel_id|
+      clear_cached_pages_for(rel_id)
+    end
+  end
+
+  def self.clear_cached_pages_for(id, options = {})
+    # NOTE: This is a partial refactoring of all the explicit expire_page calls
+    #   sprinkled through the codebase.
+    pages = [
+      "/playlists/#{id}.html",
+      "/playlists/#{id}/export.html",
+      "/playlists/#{id}/export_all.html",
+    ]
+
+    if options[:clear_iframes]
+      pages << [
+        "/iframe/load/playlists/#{id}.html",
+        "/iframe/show/playlists/#{id}.html",
+      ]
+    end
+
+    pages.flatten.each do |page|
+      ActionController::Base.expire_page page
+    end
+  end
+
   def clear_page_cache
     Rails.logger.debug "Firing for playlist id: #{id}"
     begin
-      ActionController::Base.expire_page "/playlists/#{id}.html"
-      ActionController::Base.expire_page "/playlists/#{id}/export.html"
-      ActionController::Base.expire_page "/playlists/#{id}/export_all.html"
-      ActionController::Base.expire_page "/iframe/load/playlists/#{id}.html"
-      ActionController::Base.expire_page "/iframe/show/playlists/#{id}.html"
+      self.class.clear_cached_pages_for(id, :clear_iframes => true)
 
-      relation_ids.each do |p|
-        ActionController::Base.expire_page "/playlists/#{p}.html"
-        ActionController::Base.expire_page "/playlists/#{p}/export.html"
-        ActionController::Base.expire_page "/playlists/#{p}/export_all.html"
-        ActionController::Base.expire_page "/iframe/load/playlists/#{p}.html"
-        ActionController::Base.expire_page "/iframe/show/playlists/#{p}.html"
+      relation_ids.each do |rel_id|
+        self.class.clear_cached_pages_for(rel_id, :clear_iframes => true)
       end
 
       if changed.include?("public")
         [:playlists, :collages, :cases].each do |type|
-          user.send(type).each { |i| ActionController::Base.expire_page "/#{type.to_s}/#{i.id}.html" }
+          user.send(type).each { |i| ActionController::Base.expire_page "/#{type}/#{i.id}.html" }
         end
         [:playlists, :collages].each do |type|
           user.send(type).each do |i|
-            ActionController::Base.expire_page "/iframe/load/#{type.to_s}/#{i.id}.html"
-            ActionController::Base.expire_page "/iframe/show/#{type.to_s}/#{i.id}.html"
+            ActionController::Base.expire_page "/iframe/load/#{type}/#{i.id}.html"
+            ActionController::Base.expire_page "/iframe/show/#{type}/#{i.id}.html"
           end
         end
         user.collages.update_all(updated_at: Time.now)

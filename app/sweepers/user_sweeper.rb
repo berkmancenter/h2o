@@ -4,17 +4,17 @@ class UserSweeper < ActionController::Caching::Sweeper
   observe User
 
   def after_users_delete_bookmark_item
-    if current_user
-      Rails.cache.delete("user-bookmarks-#{current_user.id}")
-      Rails.cache.delete("user-bookmarks-map-#{current_user.id}")
-    end
+    clear_cached_bookmark_fragments
   end
 
   def after_users_bookmark_item
-    if current_user
-      Rails.cache.delete("user-bookmarks-#{current_user.id}")
-      Rails.cache.delete("user-bookmarks-map-#{current_user.id}")
-    end
+    clear_cached_bookmark_fragments
+  end
+
+  def clear_cached_bookmark_fragments
+    return unless current_user
+    Rails.cache.delete("user-bookmarks-#{current_user.id}")
+    Rails.cache.delete("user-bookmarks-map-#{current_user.id}")
   end
 
   def after_update(record)
@@ -23,8 +23,7 @@ class UserSweeper < ActionController::Caching::Sweeper
         ActionController::Base.expire_page "/collages/#{collage.id}.html"
       end
       record.playlists.each do |playlist|
-        ActionController::Base.expire_page "/playlists/#{playlist.id}.html"
-        ActionController::Base.expire_page "/playlists/#{playlist.id}/export.html"
+        Playlist.clear_cached_pages_for(playlist.id)
       end
 
       Sunspot.index record.all_items

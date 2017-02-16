@@ -7,6 +7,7 @@ class CollageSweeper < ActionController::Caching::Sweeper
     begin
       ActionController::Base.expire_page "/collages/#{record.id}.html"
       ActionController::Base.expire_page "/collages/#{record.id}/export.html"
+      ActionController::Base.expire_page "/collages/#{record.id}/export_all.html"
       ActionController::Base.expire_page "/iframe/load/collages/#{record.id}.html"
       ActionController::Base.expire_page "/iframe/show/collages/#{record.id}.html"
  
@@ -56,6 +57,7 @@ class CollageSweeper < ActionController::Caching::Sweeper
   def after_collages_save_readable_state
     ActionController::Base.expire_page "/collages/#{params[:id]}.html"
     ActionController::Base.expire_page "/collages/#{params[:id]}/export.html"
+    ActionController::Base.expire_page "/collages/#{params[:id]}/export_all.html"
     ActionController::Base.expire_page "/iframe/load/collages/#{params[:id]}.html"
     ActionController::Base.expire_page "/iframe/show/collages/#{params[:id]}.html"
 

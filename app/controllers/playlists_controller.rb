@@ -190,8 +190,7 @@ class PlaylistsController < BaseController
 
   def update_notes(value, playlist)
     playlist.playlist_items.each { |pi| pi.update_column(:public_notes, value) }
-    ActionController::Base.expire_page "/playlists/#{playlist.id}.html"
-    ActionController::Base.expire_page "/playlists/#{playlist.id}/export.html"
+    Playlist.clear_cached_pages_for(playlist.id)
 
     render :json => {  :total_count => playlist.playlist_items.count,
                        :public_count => playlist.public_count,
