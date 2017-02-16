@@ -19,12 +19,8 @@ class UserSweeper < ActionController::Caching::Sweeper
 
   def after_update(record)
     if record.changed.include?("attribution")
-      record.collages.each do |collage|
-        ActionController::Base.expire_page "/collages/#{collage.id}.html"
-      end
-      record.playlists.each do |playlist|
-        Playlist.clear_cached_pages_for(playlist.id)
-      end
+      record.collages.map(&:clear_cached_pages)
+      record.playlists.map(&:clear_cached_pages)
 
       Sunspot.index record.all_items
       Sunspot.commit

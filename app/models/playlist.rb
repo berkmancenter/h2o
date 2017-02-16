@@ -6,6 +6,7 @@ class Playlist < ActiveRecord::Base
   include SpamPreventionExtension
   include DeletedItemExtensions
   include Rails.application.routes.url_helpers
+  include CachedPageManager
 
   RATINGS_DISPLAY = {
     :clone => "Cloned",
@@ -299,29 +300,7 @@ class Playlist < ActiveRecord::Base
     end
   end
 
-  def self.clear_cached_pages_for(id, options = {})
-    # NOTE: This is a partial refactoring of all the explicit expire_page calls
-    #   sprinkled through the codebase.
-    pages = [
-      "/playlists/#{id}.html",
-      "/playlists/#{id}/export.html",
-      "/playlists/#{id}/export_all.html",
-    ]
-
-    if options[:clear_iframes]
-      pages << [
-        "/iframe/load/playlists/#{id}.html",
-        "/iframe/show/playlists/#{id}.html",
-      ]
-    end
-
-    pages.flatten.each do |page|
-      ActionController::Base.expire_page page
-    end
-  end
-
   def clear_page_cache
-    Rails.logger.debug "Firing for playlist id: #{id}"
     begin
       self.class.clear_cached_pages_for(id, :clear_iframes => true)
 

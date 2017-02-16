@@ -5,20 +5,15 @@ class CollageSweeper < ActionController::Caching::Sweeper
 
   def collage_clear(record)
     begin
-      ActionController::Base.expire_page "/collages/#{record.id}.html"
-      ActionController::Base.expire_page "/collages/#{record.id}/export.html"
-      ActionController::Base.expire_page "/collages/#{record.id}/export_all.html"
-      ActionController::Base.expire_page "/iframe/load/collages/#{record.id}.html"
-      ActionController::Base.expire_page "/iframe/show/collages/#{record.id}.html"
- 
+      record.clear_cached_pages(:clear_iframes => true)
+
       #expire pages of ancestors, descendants, and siblings meta
       relations = [record.ancestor_ids, record.descendant_ids]
       relations.push(record.sibling_ids.select { |i| i != record.id }) if record.parent.present?
       Collage.where(id: relations.flatten.uniq).update_all(updated_at: Time.now)
+
       relations.flatten.uniq.each do |rel_id|
-        ActionController::Base.expire_page "/collages/#{rel_id}.html"
-        ActionController::Base.expire_page "/iframe/load/collages/#{rel_id}.html"
-        ActionController::Base.expire_page "/iframe/show/collages/#{rel_id}.html"
+        Collageclear_cached_pages_for(rel_id, :clear_iframes => true)
       end
 
       if record.changed.include?("public")
@@ -55,11 +50,7 @@ class CollageSweeper < ActionController::Caching::Sweeper
   end
 
   def after_collages_save_readable_state
-    ActionController::Base.expire_page "/collages/#{params[:id]}.html"
-    ActionController::Base.expire_page "/collages/#{params[:id]}/export.html"
-    ActionController::Base.expire_page "/collages/#{params[:id]}/export_all.html"
-    ActionController::Base.expire_page "/iframe/load/collages/#{params[:id]}.html"
-    ActionController::Base.expire_page "/iframe/show/collages/#{params[:id]}.html"
+    Collage.clear_cached_pages_for(params[:id], :clear_iframes => true)
 
     playlist_items = PlaylistItem.where({ :actual_object_type => 'Collage', :actual_object_id => params[:id] })
     PlaylistItem.clear_playlists(playlist_items)
