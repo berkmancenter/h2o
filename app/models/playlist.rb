@@ -276,9 +276,11 @@ class Playlist < ActiveRecord::Base
 
     ActionController::Base.expire_page "/playlists/#{record.id}.html"
     ActionController::Base.expire_page "/playlists/#{record.id}/export.html"
+    ActionController::Base.expire_page "/playlists/#{record.id}/export_all.html"
     record.relation_ids.each do |p|
       ActionController::Base.expire_page "/playlists/#{p}.html"
       ActionController::Base.expire_page "/playlists/#{p}/export.html"
+      ActionController::Base.expire_page "/playlists/#{p}/export_all.html"
     end
   end
 
@@ -306,12 +308,14 @@ class Playlist < ActiveRecord::Base
     begin
       ActionController::Base.expire_page "/playlists/#{id}.html"
       ActionController::Base.expire_page "/playlists/#{id}/export.html"
+      ActionController::Base.expire_page "/playlists/#{id}/export_all.html"
       ActionController::Base.expire_page "/iframe/load/playlists/#{id}.html"
       ActionController::Base.expire_page "/iframe/show/playlists/#{id}.html"
 
       relation_ids.each do |p|
         ActionController::Base.expire_page "/playlists/#{p}.html"
         ActionController::Base.expire_page "/playlists/#{p}/export.html"
+        ActionController::Base.expire_page "/playlists/#{p}/export_all.html"
         ActionController::Base.expire_page "/iframe/load/playlists/#{p}.html"
         ActionController::Base.expire_page "/iframe/show/playlists/#{p}.html"
       end
