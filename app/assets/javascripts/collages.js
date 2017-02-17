@@ -442,10 +442,14 @@ var collages = {
     setInterval(function(i) {
       var data = collages.retrieveState();
       if(JSON.stringify(data) != JSON.stringify(last_data)) {
+        if (last_data) {
+          // Only fire this if it is *not* the first pass through this method.
+          // This prevents this method from being called on page load for no reason.
+          collages.recordAnnotatedItemState(JSON.stringify(data), true);
+        }
         last_data = data;
-        collages.recordAnnotatedItemState(JSON.stringify(data), true);
       }
-    }, 1000); 
+    }, 1000);
   },
   loadState: function(collage_id, data) {
     $.each(data, function(i, e) {
