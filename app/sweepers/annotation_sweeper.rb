@@ -1,15 +1,14 @@
 require 'sweeper_helper'
 class AnnotationSweeper < ActionController::Caching::Sweeper
   include SweeperHelper
-  
   observe Annotation
 
   def collage_clear(record)
     if record.annotated_item_type == 'Collage'
-      ActionController::Base.expire_page "/collages/#{record.annotated_item_id}.html"
-      ActionController::Base.expire_page "/iframe/load/collages/#{record.annotated_item_id}.html"
-      ActionController::Base.expire_page "/iframe/show/collages/#{record.annotated_item_id}.html"
-      record.annotated_item.touch
+      collage = record.annotated_item
+      collage.clear_cached_pages(:clear_iframes => true)
+      clear_playlists(collage.playlist_items)
+      collage.touch
     end
   end
 

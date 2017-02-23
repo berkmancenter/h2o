@@ -4,16 +4,20 @@ class CollageSweeper < ActionController::Caching::Sweeper
   observe Collage
 
   def collage_clear(record)
+    Rails.logger.debug "############ CollageSweeper.collage_clear firing for #{record}"
     begin
-      record.clear_cached_pages(:clear_iframes => true)
-
-      #expire pages of ancestors, descendants, and siblings meta
       relations = [record.ancestor_ids, record.descendant_ids]
-      relations.push(record.sibling_ids.select { |i| i != record.id }) if record.parent.present?
-      Collage.where(id: relations.flatten.uniq).update_all(updated_at: Time.now)
 
-      relations.flatten.uniq.each do |rel_id|
-        Collageclear_cached_pages_for(rel_id, :clear_iframes => true)
+      Rails.logger.debug "BOOP: Ancestor IDS: #{record.ancestor_ids}"
+      Rails.logger.debug "BOOP: Descendant IDS: #{record.descendant_ids}"
+
+      relations.push(record.sibling_ids.select { |i| i != record.id }) if record.parent.present?
+
+      related_collages = Collage.where(id: relations.flatten)
+      related_collages.update_all(updated_at: Time.now)
+
+      [record, related_collages].flatten.each do |collage|
+        collage.clear_cached_pages(:clear_iframes => true)
       end
 
       if record.changed.include?("public")
@@ -28,6 +32,8 @@ class CollageSweeper < ActionController::Caching::Sweeper
         end
         record.user.collages.update_all(updated_at: Time.now)
       end
+
+      clear_playlists(record.playlist_items)
     rescue Exception => e
       Rails.logger.warn "Collage sweeper error: #{e.inspect}"
     end
@@ -50,9 +56,8 @@ class CollageSweeper < ActionController::Caching::Sweeper
   end
 
   def after_collages_save_readable_state
-    Collage.clear_cached_pages_for(params[:id], :clear_iframes => true)
-
-    playlist_items = PlaylistItem.where({ :actual_object_type => 'Collage', :actual_object_id => params[:id] })
-    PlaylistItem.clear_playlists(playlist_items)
+    collage = Collage.find(params[:id])
+    collage.clear_cached_pages(:clear_iframes => true)
+    clear_playlists(collage.playlist_items)
   end
 end

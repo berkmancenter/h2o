@@ -1,12 +1,10 @@
+require 'active_support/concern'
+
 module CachedPageManager
   extend ActiveSupport::Concern
 
-  module InstanceMethods
-
-    def clear_cached_pages(options = {})
-      self.class.clear_cached_pages_for(self.id, options)
-    end
-
+  def clear_cached_pages(options = {})
+    self.class.clear_cached_pages_for(self.id, options)
   end
 
   module ClassMethods
@@ -17,7 +15,7 @@ module CachedPageManager
       return unless id
 
       dir = self.name.underscore.pluralize
-      Rails.logger.debug "Cached pages base directory: #{dir}"
+      # Rails.logger.debug "Cached pages base directory: #{dir}"
 
       pages = [
         "/#{dir}/#{id}.html",

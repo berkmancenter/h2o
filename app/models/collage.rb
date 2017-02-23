@@ -8,6 +8,7 @@ class Collage < ActiveRecord::Base
   include DeletedItemExtensions
   include Rails.application.routes.url_helpers
   include ActionView::Helpers::TextHelper
+  include CachedPageManager
 
   RATINGS_DISPLAY = {
     :clone => "Cloned",
