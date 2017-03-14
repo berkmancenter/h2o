@@ -27,3 +27,4 @@ config/initializers/h2o_secret.rb
 config/dropbox_access_token/*
 bin/phantomjs
 public/exports/
+solr/development/data/
