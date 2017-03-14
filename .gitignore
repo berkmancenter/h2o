@@ -28,3 +28,5 @@ config/dropbox_access_token/*
 bin/phantomjs
 public/exports/
 solr/development/data/
+passenger.3000.pid
+passenger.3000.pid.lock
