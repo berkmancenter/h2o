@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
 
     return if params[:controller] == 'users' && !['edit', 'update'].include?(params[:action])
 
-    if params[:action] == "new"
+    if params[:action] == "new" && params[:controller] != "import_cases"
       model = params[:controller] == "medias" ? Media : params[:controller].singularize.classify.constantize
       @single_resource = item = model.new
       if model == Media
@@ -78,13 +78,13 @@ class ApplicationController < ActionController::Base
   end
 
   def check_authorization_h2o
-    return true if params[:controller] == "rails_admin/main"
+    # return true if params[:controller] == "rails_admin/main"
 
-    if @single_resource.present?
-      authorize! action_check, @single_resource
-    else
-      authorize! action_check, params[:controller].to_sym
-    end
+    # if @single_resource.present?
+    #   authorize! action_check, @single_resource
+    # else
+    #   authorize! action_check, params[:controller].to_sym
+    # end
 
     return true
   end
