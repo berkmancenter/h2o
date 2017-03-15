@@ -1,0 +1,26 @@
+<table>
+	<thead>
+		<tr>
+			<!-- <th>In H2O?</th> -->
+			<th>Name</th>
+			<th>Name Abbreviation></th>
+			<th>Jurisdiction Name</th>
+			<th>Descision Date (Original)</th>
+			<th>Courst Name</th>
+			<th>Court Id</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		<% @results.each do |result| %>
+			<tr>
+				<td><%= result["name"] %></td>
+				<td><%= result["name_abbreviation"] %></td>
+				<td><%= result["jurisdiction_name"] %></td>
+				<td><%= result["decisiondate_original"] %></td>
+				<td><%= result["court_name"] %></td>
+				<td><%= result["court_id"] %></td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>

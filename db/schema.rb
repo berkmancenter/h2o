@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151211174939) do
+ActiveRecord::Schema.define(version: 20170315135325) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -274,6 +274,26 @@ ActiveRecord::Schema.define(version: 20151211174939) do
     t.integer  "version",    null: false
     t.integer  "item_id",    null: false
     t.string   "item_type",  null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "import_cases", force: true do |t|
+    t.string   "name"
+    t.string   "name_abbreviation"
+    t.string   "url"
+    t.integer  "jurisdiction_id"
+    t.string   "jurisdiction_name"
+    t.string   "docket_number"
+    t.string   "decisiondate_original"
+    t.string   "court_name"
+    t.integer  "court_id"
+    t.string   "reporter_name"
+    t.integer  "reporter_id"
+    t.integer  "volume"
+    t.string   "citation"
+    t.integer  "firstpage"
+    t.integer  "lastpage"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
