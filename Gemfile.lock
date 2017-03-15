@@ -86,6 +86,8 @@ GEM
       tilt
     highline (1.7.8)
     hike (1.2.3)
+    httparty (0.14.0)
+      multi_xml (>= 0.5.2)
     i18n (0.8.1)
     jbuilder (1.5.3)
       activesupport (>= 3.0.0)
@@ -114,6 +116,7 @@ GEM
     mini_portile2 (2.1.0)
     minitest (5.10.1)
     multi_json (1.12.1)
+    multi_xml (0.6.0)
     nested_form (0.3.2)
     nokogiri (1.7.0.1)
       mini_portile2 (~> 2.1.0)
@@ -210,6 +213,9 @@ GEM
     scrypt (3.0.3)
       ffi-compiler (>= 1.0.0)
       rake
+    simple_form (3.4.0)
+      actionpack (> 4, < 5.1)
+      activemodel (> 4, < 5.1)
     slop (3.6.0)
     sprockets (2.12.4)
       hike (~> 1.2)
@@ -262,6 +268,7 @@ DEPENDENCIES
   exception_notification
   fastercsv
   formtastic (~> 2.3.0.rc2)
+  httparty
   jbuilder (~> 1.2)
   jquery-rails
   jquery-ui-rails
@@ -282,6 +289,7 @@ DEPENDENCIES
   rspec-rails
   sass-rails (~> 4.0.0)
   scrypt
+  simple_form
   sunspot_rails
   sunspot_solr
   therubyracer
