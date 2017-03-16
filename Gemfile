@@ -43,7 +43,6 @@ gem 'scrypt'
 gem 'rails_admin_import', '0.1.9'
 gem 'loofah-activerecord', '~> 1.2'
 
-gem 'simple_form'
 gem 'httparty'
 
 group :development do

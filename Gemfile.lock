@@ -213,9 +213,6 @@ GEM
     scrypt (3.0.3)
       ffi-compiler (>= 1.0.0)
       rake
-    simple_form (3.4.0)
-      actionpack (> 4, < 5.1)
-      activemodel (> 4, < 5.1)
     slop (3.6.0)
     sprockets (2.12.4)
       hike (~> 1.2)
@@ -289,7 +286,6 @@ DEPENDENCIES
   rspec-rails
   sass-rails (~> 4.0.0)
   scrypt
-  simple_form
   sunspot_rails
   sunspot_solr
   therubyracer
