@@ -1,7 +1,6 @@
 <table>
 	<thead>
 		<tr>
-			<!-- <th>In H2O?</th> -->
 			<th>Name</th>
 			<th>Name Abbreviation></th>
 			<th>Jurisdiction Name</th>
@@ -13,6 +12,7 @@
 
 	<tbody>
 		<% @results.each do |result| %>
+			<%= result %>
 			<tr>
 				<td><%= result["name"] %></td>
 				<td><%= result["name_abbreviation"] %></td>

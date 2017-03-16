@@ -18,20 +18,12 @@ class ImportCasesController < BaseController
         response = HTTParty.get("https://capapi.org/api/v1/cases/?#{variables.to_query}&format=json")
 
 
-        cases = response["results"]
-        @results = remove_preexisting_cases(cases)
+        @results = response["results"]
 
         render :show
     end
 
-    # def show
-    #     binding.remote_pry 
-    # end
-
     private
-
-    def remove_preexisting_cases(cases)
-    end
 
     def import_case_params
         params.require(:import_case).permit(
