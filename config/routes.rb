@@ -14,7 +14,7 @@ H2o::Application.routes.draw do
   resources :login_notifiers, only: [:new, :create]
   resources :password_resets, only: [:new, :create, :edit, :update]
   resources :user_sessions, only: [:new, :create, :destroy, :index]
-  resources :import_cases, only: [:new, :create, :show]
+  resources :case_search, only: [:new, :create, :show]
 
   get 'log_out' => 'user_sessions#destroy', as: :log_out
   get '/bookmark_item/:type/:id' => 'users#bookmark_item', as: :bookmark_item

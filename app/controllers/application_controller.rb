@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
 
     return if params[:controller] == 'users' && !['edit', 'update'].include?(params[:action])
 
-    if params[:action] == "new" && params[:controller] != "import_cases"
+    if params[:action] == "new" && params[:controller] != "case_search"
       model = params[:controller] == "medias" ? Media : params[:controller].singularize.classify.constantize
       @single_resource = item = model.new
       if model == Media
