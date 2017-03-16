@@ -44,6 +44,7 @@ gem 'rails_admin_import', '0.1.9'
 gem 'loofah-activerecord', '~> 1.2'
 
 gem 'httparty'
+gem 'rubyzip'
 
 group :development do
   gem 'pry'
