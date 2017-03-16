@@ -1,6 +1,7 @@
 <table>
 	<thead>
 		<tr>
+			<th>Downloaded?</th>
 			<th>Name</th>
 			<th>Name Abbreviation></th>
 			<th>Jurisdiction Name</th>
@@ -11,14 +12,15 @@
 	</thead>
 
 	<tbody>
-		<% @results.each do |result| %>
+		<% @cases.each do |kase| %>
 			<tr>
-				<td><%= result["name"] %></td>
-				<td><%= result["name_abbreviation"] %></td>
-				<td><%= result["jurisdiction_name"] %></td>
-				<td><%= result["decisiondate_original"] %></td>
-				<td><%= result["court_name"] %></td>
-				<td><%= result["court_id"] %></td>
+				<td><%= kase["downloaded"] %></td>
+				<td><%= kase["name"] %></td>
+				<td><%= kase["name_abbreviation"] %></td>
+				<td><%= kase["jurisdiction_name"] %></td>
+				<td><%= kase["decisiondate_original"] %></td>
+				<td><%= kase["court_name"] %></td>
+				<td><%= kase["court_id"] %></td>
 			</tr>
 		<% end %>
 	</tbody>
