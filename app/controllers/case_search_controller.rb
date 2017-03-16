@@ -3,29 +3,17 @@ class CaseSearchController < BaseController
     end
 
     def create
+        variables = {}
+        CaseSearch::CASE_FIELDS.each do |field|
+            if import_case_params[field].present?
+                variables[field] = import_case_params[field]
+            end
+        end
 
-        puts params
-        puts "*****"
-        puts "*****"
-        puts "*****"
-
-        # @importCase = ImportCase.new(import_case_params)
-
-        # results = 
-
-        # importCaseColumnNames = ImportCase.columns.map(&:name)
-
-        # variables = {}
-        # importCaseColumnNames.each do |variable| 
-        #     if @importCase[variable].present?
-        #         variables[variable] = @importCase[variable]
-        #     end
-        # end
-
-        # response = HTTParty.get("https://capapi.org/api/v1/cases/?#{variables.to_query}&format=json")
+        response = HTTParty.get("https://capapi.org/api/v1/cases/?#{variables.to_query}&format=json")
 
 
-        # @results = response["results"]
+        @results = response["results"]
 
         render :show
     end
