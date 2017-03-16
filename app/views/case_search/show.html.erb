@@ -1,27 +1,30 @@
-<table>
-	<thead>
-		<tr>
-			<th>Downloaded?</th>
-			<th>Name</th>
-			<th>Name Abbreviation></th>
-			<th>Jurisdiction Name</th>
-			<th>Descision Date (Original)</th>
-			<th>Courst Name</th>
-			<th>Court Id</th>
-		</tr>
-	</thead>
-
-	<tbody>
-		<% @cases.each do |kase| %>
+<%= form_tag "case_search/download", method: :put do %>
+	<table>
+		<thead>
 			<tr>
-				<td><%= kase["downloaded"] %></td>
-				<td><%= kase["name"] %></td>
-				<td><%= kase["name_abbreviation"] %></td>
-				<td><%= kase["jurisdiction_name"] %></td>
-				<td><%= kase["decisiondate_original"] %></td>
-				<td><%= kase["court_name"] %></td>
-				<td><%= kase["court_id"] %></td>
+				<th>Download</th>
+				<th>Name</th>
+				<th>Name Abbreviation></th>
+				<th>Jurisdiction Name</th>
+				<th>Descision Date (Original)</th>
+				<th>Courst Name</th>
+				<th>Court Id</th>
 			</tr>
-		<% end %>
-	</tbody>
-</table>
+		</thead>
+
+		<tbody>
+			<% @cases.each do |kase| %>
+				<tr>
+					<td><%= check_box_tag "case_slugs[]", kase["slug"] %></td>
+					<td><%= kase["name"] %></td>
+					<td><%= kase["name_abbreviation"] %></td>
+					<td><%= kase["jurisdiction_name"] %></td>
+					<td><%= kase["decisiondate_original"] %></td>
+					<td><%= kase["court_name"] %></td>
+					<td><%= kase["court_id"] %></td>
+				</tr>
+			<% end %>
+		</tbody>
+	</table>
+	<%= submit_tag "Download new caes" %>
+<% end %>
