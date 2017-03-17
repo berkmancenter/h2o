@@ -27,12 +27,12 @@ class CaseSearchController < BaseController
     def download 
         case_url = params[:case_slugs][0]
 
-        response = HTTParty.get("https://capapi.org/api/v1/cases/waters-v-state-2213/?type=download&max=1", 
+        response = HTTParty.get("https://capapi.org/api/v1/cases/#{case_url}/?type=download&max=1", 
             query: { "type" => "download" },
             headers: { "Authorization" => "Token 2c62c54b47e507b2eee20a70f29f1b4ae0ccd1a3" }
         )
 
-        metadata = HTTParty.get("https://capapi.org/api/v1/cases/waters-v-state-2213/?format=json")
+        metadata = HTTParty.get("https://capapi.org/api/v1/cases/#{case_url}/?format=json")
 
         input = response.body
 
