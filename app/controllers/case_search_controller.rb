@@ -32,13 +32,20 @@ class CaseSearchController < BaseController
             headers: { "Authorization" => "Token 2c62c54b47e507b2eee20a70f29f1b4ae0ccd1a3" }
         )
 
+        metadata = HTTParty.get("https://capapi.org/api/v1/cases/waters-v-state-2213/?format=json")
+
         input = response.body
+
+        puts "*********"
+        puts "here"
 
 
         Zip::InputStream.open(StringIO.new(input)) do |io|
           while entry = io.get_next_entry
             puts entry.name
             puts "*************"
+            kontent = entry.get_input_stream.read
+            Case.create(short_name: metadata["name_abbreviation"], full_name: metadata["name"], decision_date: metadata["decisiondate_original"], case_jurisdiction_id: metadata["jurisdiction_id"], content: kontent, user_id: 2, created_via_import: true)
             # parse_zip_content io.read
           end
         end
