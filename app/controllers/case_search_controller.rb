@@ -38,8 +38,6 @@ class CaseSearchController < BaseController
 
         Zip::InputStream.open(StringIO.new(input)) do |io|
           while entry = io.get_next_entry
-            puts entry.name
-            puts "*************"
             kontent = entry.get_input_stream.read
             @case = Case.create(short_name: metadata["name_abbreviation"], full_name: metadata["name"], decision_date: metadata["decisiondate_original"], case_jurisdiction_id: metadata["jurisdiction_id"], content: kontent, user_id: 2, created_via_import: true)
           end
