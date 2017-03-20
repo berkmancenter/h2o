@@ -5,14 +5,14 @@ class CaseSearchController < BaseController
     end
 
     def create
-        variables = {}
+        params = {}
         CaseSearch::CASE_FIELDS.each do |field|
             if import_case_params[field].present?
-                variables[field] = import_case_params[field]
+                params[field] = import_case_params[field]
             end
         end
 
-        response = HTTParty.get("https://capapi.org/api/v1/cases/?#{variables.to_query}&format=json")
+        response = HTTParty.get("https://capapi.org/api/v1/cases/?#{params.to_query}&format=json")
         @cases = response["results"]
 
         @cases.each do |kase|
@@ -24,26 +24,26 @@ class CaseSearchController < BaseController
         render :show
     end
 
-    def download 
-        case_url = params[:case_slugs][0]
+    def download
+        cap_case = eval params[:case]
 
-        response = HTTParty.get("https://capapi.org/api/v1/cases/#{case_url}/?type=download&max=1", 
+        response = HTTParty.get("https://capapi.org/api/v1/cases/#{cap_case["slug"]}/?type=download&max=1", 
             query: { "type" => "download" },
             headers: { "Authorization" => "Token 2c62c54b47e507b2eee20a70f29f1b4ae0ccd1a3" }
         )
-
-        metadata = HTTParty.get("https://capapi.org/api/v1/cases/#{case_url}/?format=json")
 
         input = response.body
 
         Zip::InputStream.open(StringIO.new(input)) do |io|
           while entry = io.get_next_entry
             kontent = entry.get_input_stream.read
-            @case = Case.create(short_name: metadata["name_abbreviation"], full_name: metadata["name"], decision_date: metadata["decisiondate_original"], case_jurisdiction_id: metadata["jurisdiction_id"], content: kontent, user_id: 2, created_via_import: true)
+            @new_case = Case.create(short_name: cap_case["name_abbreviation"], full_name: cap_case["name"], 
+                decision_date: cap_case["decisiondate_original"], case_jurisdiction_id: cap_case["jurisdiction_id"], 
+                content: kontent, user_id: current_user.id, created_via_import: true)
           end
         end
 
-        redirect_to case_path(@case)
+        redirect_to case_path(@new_case)
     end
 
     private

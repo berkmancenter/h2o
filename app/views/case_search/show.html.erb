@@ -11,11 +11,11 @@
 				<th>Court Id</th>
 			</tr>
 		</thead>
-
+		
 		<tbody>
 			<% @cases.each do |kase| %>
 				<tr>
-					<td><%= check_box_tag "case_slugs[]", kase["slug"] %></td>
+					<td><%= radio_button_tag "case", kase %></td>
 					<td><%= kase["name"] %></td>
 					<td><%= kase["name_abbreviation"] %></td>
 					<td><%= kase["jurisdiction_name"] %></td>
@@ -26,5 +26,5 @@
 			<% end %>
 		</tbody>
 	</table>
-	<%= submit_tag "Download new caes" %>
+	<%= submit_tag "Download new case" %>
 <% end %>
