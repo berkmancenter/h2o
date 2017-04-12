@@ -43,7 +43,12 @@ gem 'scrypt'
 gem 'rails_admin_import', '0.1.9'
 gem 'loofah-activerecord', '~> 1.2'
 
+gem 'httparty'
+gem 'rubyzip'
+
 group :development do
+  gem 'pry'
+  gem 'pry-remote'
   gem 'sunspot_solr'
   gem 'quiet_assets'
   gem 'rspec-rails'
