@@ -1,42 +1,43 @@
-
 <table width="100%" id="user_form_markup">
+  <div class="login-disabled">
+    <h2>User registration disabled</h2>
+    <p>The new H2O platform is on it's way! If you have any questions email <a href="mailto:h2o@cyber.law.harvard.edu">h2o@cyber.law.harvard.edu</a></p>
+  </div>
   <tr>
-    <td valign="top" id="firstcol">
+  <!--    <td valign="top" id="firstcol">
       <p>
         <%= form.label :login %>
-        <%= form.text_field :login %>
+        <%= form.text_field :login, disabled: true %>
       </p>
       <p>
         <%= form.label :email_address, ('Email Address (must be a .edu address)' if @user.new_record?) %>
-        <%= form.text_field :email_address %>
+        <%= form.text_field :email_address, disabled: true  %>
       </p>
       <p>
         <%= form.label :attribution, "Name" %>
-        <%= form.text_field :attribution %>
+        <%= form.text_field :attribution, disabled: true  %>
       </p>
       <p>
         <%= form.label :title %>
-        <%= form.text_field :title %>
+        <%= form.text_field :title, disabled: true  %>
       </p>
-<!--
       <p>
         <%= form.label :url %>
         <%= form.text_field :url %>
       </p>
--->
+
       <p>
         <%= form.label :affiliation %>
-        <%= form.text_field :affiliation %>
+        <%= form.text_field :affiliation, disabled: true  %>
       </p>
-<!--
       <p>
         <%= form.label :description %>
         <%= form.text_area :description, :rows => 5, :class => "no_tinymce" %>
       </p>
--->
+--> 
     </td>
     <td valign="top" id="secondcol">
-      <p>Default display settings:</p>
+      <!-- <p>Default display settings:</p> -->
       <% if !@user.new_record? -%>
         <p>
           <%= form.label :default_show_comments, "Show Comments" %>
@@ -69,18 +70,18 @@
           Open new collages, media, texts, playlists, etc. in a new tab?
         </p>
       <% end %>
-      <p>
+ <!--      <p>
         <%= form.label :tz_name, "Timezone" %>
         <%= form.time_zone_select :tz_name, ActiveSupport::TimeZone.us_zones, { :include_blank => true } %>
-      </p>
-      <p>
+      </p> -->
+     <!--  <p>
         <%= form.label :password, form.object.new_record? ? nil : "Change password" %>
         <%= form.password_field :password %>
       </p>
       <p>
         <%= form.label :password_confirmation %>
         <%= form.password_field :password_confirmation %>
-      </p>
+      </p> -->
       <% if form.object.new_record? -%>
       <ul>
       <%= render :partial => 'shared/captcha', :locals => { :single_resource => @user } %>
@@ -135,10 +136,10 @@
   </tr>
   <% if form.object.new_record? -%>
   <tr>
-    <td colspan="3" align="center" style="padding:10px 0px;">
-      <%= form.check_box :terms %>
+    <!-- <td colspan="3" align="center" style="padding:10px 0px;">
+      <%= form.check_box :terms, disabled: true %>
       I certify that I have read and agree to the <a href="/p/terms" target="_blank">Terms of Service</a>.
-    </td>
+    </td> -->
   </tr>
   <% end -%>
 </table>
