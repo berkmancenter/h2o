@@ -1,43 +1,12 @@
-<p class="read-only-message">H2O will be switching to read-only mode next Wednesday, June 20th; at that time you will no longer be able to log in and make changes. We are working to ensure data is migrated appropriately. If you have any questions, please contact us at <a href="mailto:h2o@cyber.law.harvard.edu">h2o@cyber.law.harvard.edu</a>.</p>
-
 <table width="100%" id="user_form_markup">
+  <div class="login-disabled">
+    <h2>User registration disabled</h2>
+    <p>H2O is now set to read-only mode; logging in and editing are no longer possible. All data has been migrated to the new version of H2O; if you haven't already been contacted regarding your data move or are interested in building or using a casebook on H2O, please contact Brett at <a href="mailto:h2o@cyber.law.harvard.edu">h2o@cyber.law.harvard.edu</a></p>
+  </div>
   <tr>
-    <td valign="top" id="firstcol">
-      <p>
-        <%= form.label :login %>
-        <%= form.text_field :login %>
-      </p>
-      <p>
-        <%= form.label :email_address, ('Email Address (must be a .edu address)' if @user.new_record?) %>
-        <%= form.text_field :email_address %>
-      </p>
-      <p>
-        <%= form.label :attribution, "Name" %>
-        <%= form.text_field :attribution %>
-      </p>
-      <p>
-        <%= form.label :title %>
-        <%= form.text_field :title %>
-      </p>
-<!--
-      <p>
-        <%= form.label :url %>
-        <%= form.text_field :url %>
-      </p>
--->
-      <p>
-        <%= form.label :affiliation %>
-        <%= form.text_field :affiliation %>
-      </p>
-<!--
-      <p>
-        <%= form.label :description %>
-        <%= form.text_area :description, :rows => 5, :class => "no_tinymce" %>
-      </p>
--->
     </td>
     <td valign="top" id="secondcol">
-      <p>Default display settings:</p>
+      <!-- <p>Default display settings:</p> -->
       <% if !@user.new_record? -%>
         <p>
           <%= form.label :default_show_comments, "Show Comments" %>
@@ -70,18 +39,18 @@
           Open new collages, media, texts, playlists, etc. in a new tab?
         </p>
       <% end %>
-      <p>
+ <!--      <p>
         <%= form.label :tz_name, "Timezone" %>
         <%= form.time_zone_select :tz_name, ActiveSupport::TimeZone.us_zones, { :include_blank => true } %>
-      </p>
-      <p>
+      </p> -->
+     <!--  <p>
         <%= form.label :password, form.object.new_record? ? nil : "Change password" %>
         <%= form.password_field :password %>
       </p>
       <p>
         <%= form.label :password_confirmation %>
         <%= form.password_field :password_confirmation %>
-      </p>
+      </p> -->
       <% if form.object.new_record? -%>
       <ul>
       <%= render :partial => 'shared/captcha', :locals => { :single_resource => @user } %>
@@ -134,12 +103,4 @@
     </td>
     <% end -%>
   </tr>
-  <% if form.object.new_record? -%>
-  <tr>
-    <td colspan="3" align="center" style="padding:10px 0px;">
-      <%= form.check_box :terms %>
-      I certify that I have read and agree to the <a href="/p/terms" target="_blank">Terms of Service</a>.
-    </td>
-  </tr>
-  <% end -%>
 </table>

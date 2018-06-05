@@ -1,27 +1,8 @@
 <% if !current_user || @page_cache -%>
 <div id="login-popup" class="standard-form popup">
-   <p>H2O will be switching to read-only mode next Wednesday, June 20th; at that time you will no longer be able to log in and make changes. We are working to ensure data is migrated appropriately. If you have any questions, please contact us at <a href="mailto:h2o@cyber.law.harvard.edu">h2o@cyber.law.harvard.edu</a>.</p>
   <div class="right">
-    <h3>Returning user log in</h3>
-    <%= form_for UserSession.new do |f| %>
-    <%= f.label :login %>
-    <%= f.text_field :login, :class => 'text' %>
-    <%= f.label :password %>
-    <%= f.password_field :password, :class => 'text' %>
-    <div class="remember">
-    <%= link_to 'Forgot your password?', new_password_reset_path %>
+    <div class="login-disabled">
+        <h2>User login disabled</h2>
+        <p>H2O is now set to read-only mode; logging in and editing are no longer possible. All data has been migrated to the new version of H2O; if you haven't already been contacted regarding your data move or are interested in building or using a casebook on H2O, please contact Brett at <a href="mailto:h2o@cyber.law.harvard.edu">h2o@cyber.law.harvard.edu</a></p>"
     </div>
-    <div class="remember">
-    <%= f.check_box :remember_me %><%= f.label :remember_me %>
-    </div>
-    <div class="center">
-    <%= f.submit "LOGIN", :class => 'button' %>
-    </div>
-    <% end -%>
-  </div>
-  <div class="left">
-    <h3>Are you a first-time user?</h3>
-    <a href="/users/new/" class="button">SIGN UP NOW</a>
-  </div>
-</div>
 <% end -%>
