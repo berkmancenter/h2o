@@ -1,6 +1,6 @@
 <div class="standard-form">
-	<h1>Register</h1>
-	<%= form_for @user, :url => users_path, :html => { :class => "formtastic" } do |f| %>
+  <h1>Register</h1>
+  <%= form_for @user, :url => users_path, :html => { :class => "formtastic" } do |f| %>
     <% if @user.errors.any? %>
     <ul class="error">
       <% @user.errors.full_messages.each do |msg| %>
@@ -8,9 +8,9 @@
       <% end %>
     </ul>
     <% end %>
- 	  <%= render :partial => "form", :object => f %>
-    <div style="text-align:center;width:100%;">
-	  <%= f.submit "Register", :class => 'button' %>
-    </div>
-	<% end %>
+    <%= render :partial => "form", :object => f %>
+<!--     <div style="text-align:center;width:100%;">
+    <%= f.submit "Register", :class => 'button', disabled: true %>
+    </div> -->
+  <% end %>
 </div>
