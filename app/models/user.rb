@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
 
   acts_as_authentic do |c|
     c.crypto_provider = Authlogic::CryptoProviders::Sha512
+    c.logged_in_timeout = 2.hours
   end
 
   has_and_belongs_to_many :roles
