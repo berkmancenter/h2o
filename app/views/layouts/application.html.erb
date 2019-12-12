@@ -24,6 +24,10 @@ var UTC_OFFSET = #{Time.zone.now.utc_offset * 1000};") %>
     <%= render :partial => "shared/nav" %>
     <div class="wrapper main_wrapper">
 
+    <p id="notice" style="padding:15px 25px">
+        This is the old version of the H2O platform and is now read-only. This means you can view content but cannot create content. You can access the new platform at <a href="https://opencasebook.org">https://opencasebook.org</a>. Thank you.
+    </p>
+
     <% if flash[:notice] && flash[:notice].match(/^Your account has not been verified/) %>
     <p id="notice"><%= raw flash[:notice] %></p>
     <% elsif flash[:notice] && !@page_cache %>
