@@ -164,7 +164,7 @@ GEM
       activesupport (= 4.1.7)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    rake (10.3.2)
+    rake (13.0.1)
     recaptcha (0.3.6)
     ref (1.0.5)
     remotipart (1.2.1)
